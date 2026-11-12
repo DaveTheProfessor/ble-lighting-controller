@@ -1,0 +1,34 @@
+# Local dependencies and compiler output
+/runtime/
+/work/
+**/__pycache__/
+*.py[cod]
+*.exe
+*.dll
+*.pdb
+*.zip
+.env
+.env.*
+!.env.example
+# Hardware identities and operating state must remain local.
+/devices.json
+/fairy-devices.json
+/fairy-state.json
+/studio-settings.json
+/schedules.json
+/schedule-runs.json
+/schedule-worker-status.json
+/history.json
+/santa-schedule.json
+/Santa Schedule.txt
+/.bluetooth*
+/.schedule*
+/history/
+/renders/
+/schedule-media/
+/designs/
+/drawings/
+/*check*.json
+/*report*.json
+/studio-check.txt
+*.log

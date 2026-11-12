@@ -1,0 +1,21 @@
+{
+  "selected": [],
+  "design": {
+    "content": "text",
+    "text": "WELCOME",
+    "color": "ffffff",
+    "bg_color": "000000",
+    "bg_color2": "000000",
+    "background": "Solid",
+    "text_palette": "Solid",
+    "font": "Bold",
+    "font_size": 13,
+    "effect": "None",
+    "animation": "static",
+    "speed": 60,
+    "image_path": "",
+    "fit": "fit",
+    "width": 96,
+    "height": 16
+  }
+}

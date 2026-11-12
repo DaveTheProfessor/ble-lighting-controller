@@ -1,0 +1,272 @@
+[
+  {
+    "name": "Smile",
+    "text": "😀",
+    "file": "emoji/1f600.png"
+  },
+  {
+    "name": "Laugh",
+    "text": "😂",
+    "file": "emoji/1f602.png"
+  },
+  {
+    "name": "Love",
+    "text": "😍",
+    "file": "emoji/1f60d.png"
+  },
+  {
+    "name": "Cool",
+    "text": "😎",
+    "file": "emoji/1f60e.png"
+  },
+  {
+    "name": "Wave",
+    "text": "👋",
+    "file": "emoji/1f44b.png"
+  },
+  {
+    "name": "Thumbs up",
+    "text": "👍",
+    "file": "emoji/1f44d.png"
+  },
+  {
+    "name": "Clap",
+    "text": "👏",
+    "file": "emoji/1f44f.png"
+  },
+  {
+    "name": "Party",
+    "text": "🥳",
+    "file": "emoji/1f973.png"
+  },
+  {
+    "name": "Heart",
+    "text": "❤️",
+    "file": "emoji/2764.png"
+  },
+  {
+    "name": "Sparkles",
+    "text": "✨",
+    "file": "emoji/2728.png"
+  },
+  {
+    "name": "Star",
+    "text": "⭐",
+    "file": "emoji/2b50.png"
+  },
+  {
+    "name": "Fire",
+    "text": "🔥",
+    "file": "emoji/1f525.png"
+  },
+  {
+    "name": "Rainbow",
+    "text": "🌈",
+    "file": "emoji/1f308.png"
+  },
+  {
+    "name": "Sun",
+    "text": "☀️",
+    "file": "emoji/2600.png"
+  },
+  {
+    "name": "Moon",
+    "text": "🌙",
+    "file": "emoji/1f319.png"
+  },
+  {
+    "name": "Music",
+    "text": "🎵",
+    "file": "emoji/1f3b5.png"
+  },
+  {
+    "name": "Camera",
+    "text": "📷",
+    "file": "emoji/1f4f7.png"
+  },
+  {
+    "name": "Gift",
+    "text": "🎁",
+    "file": "emoji/1f381.png"
+  },
+  {
+    "name": "Balloon",
+    "text": "🎈",
+    "file": "emoji/1f388.png"
+  },
+  {
+    "name": "Confetti",
+    "text": "🎉",
+    "file": "emoji/1f389.png"
+  },
+  {
+    "name": "Cake",
+    "text": "🎂",
+    "file": "emoji/1f382.png"
+  },
+  {
+    "name": "Champagne",
+    "text": "🍾",
+    "file": "emoji/1f37e.png"
+  },
+  {
+    "name": "Christmas tree",
+    "text": "🎄",
+    "file": "emoji/1f384.png"
+  },
+  {
+    "name": "Santa",
+    "text": "🎅",
+    "file": "emoji/1f385.png"
+  },
+  {
+    "name": "Snowman",
+    "text": "☃️",
+    "file": "emoji/2603.png"
+  },
+  {
+    "name": "Snowflake",
+    "text": "❄️",
+    "file": "emoji/2744.png"
+  },
+  {
+    "name": "Reindeer",
+    "text": "🦌",
+    "file": "emoji/1f98c.png"
+  },
+  {
+    "name": "Bell",
+    "text": "🔔",
+    "file": "emoji/1f514.png"
+  },
+  {
+    "name": "Pumpkin",
+    "text": "🎃",
+    "file": "emoji/1f383.png"
+  },
+  {
+    "name": "Ghost",
+    "text": "👻",
+    "file": "emoji/1f47b.png"
+  },
+  {
+    "name": "Bat",
+    "text": "🦇",
+    "file": "emoji/1f987.png"
+  },
+  {
+    "name": "Skull",
+    "text": "💀",
+    "file": "emoji/1f480.png"
+  },
+  {
+    "name": "Turkey",
+    "text": "🦃",
+    "file": "emoji/1f983.png"
+  },
+  {
+    "name": "Maple leaf",
+    "text": "🍁",
+    "file": "emoji/1f341.png"
+  },
+  {
+    "name": "Heart gift",
+    "text": "💝",
+    "file": "emoji/1f49d.png"
+  },
+  {
+    "name": "Rose",
+    "text": "🌹",
+    "file": "emoji/1f339.png"
+  },
+  {
+    "name": "Clover",
+    "text": "☘️",
+    "file": "emoji/2618.png"
+  },
+  {
+    "name": "Rainbow pot",
+    "text": "🌟",
+    "file": "emoji/1f31f.png"
+  },
+  {
+    "name": "Rabbit",
+    "text": "🐰",
+    "file": "emoji/1f430.png"
+  },
+  {
+    "name": "Egg",
+    "text": "🥚",
+    "file": "emoji/1f95a.png"
+  },
+  {
+    "name": "Chick",
+    "text": "🐣",
+    "file": "emoji/1f423.png"
+  },
+  {
+    "name": "Flag USA",
+    "text": "🇺🇸",
+    "file": "emoji/1f1fa-1f1f8.png"
+  },
+  {
+    "name": "Fireworks",
+    "text": "🎆",
+    "file": "emoji/1f386.png"
+  },
+  {
+    "name": "Graduation",
+    "text": "🎓",
+    "file": "emoji/1f393.png"
+  },
+  {
+    "name": "Soccer",
+    "text": "⚽",
+    "file": "emoji/26bd.png"
+  },
+  {
+    "name": "Football",
+    "text": "🏈",
+    "file": "emoji/1f3c8.png"
+  },
+  {
+    "name": "Basketball",
+    "text": "🏀",
+    "file": "emoji/1f3c0.png"
+  },
+  {
+    "name": "Coffee",
+    "text": "☕",
+    "file": "emoji/2615.png"
+  },
+  {
+    "name": "Pizza",
+    "text": "🍕",
+    "file": "emoji/1f355.png"
+  },
+  {
+    "name": "Beer",
+    "text": "🍺",
+    "file": "emoji/1f37a.png"
+  },
+  {
+    "name": "Check",
+    "text": "✅",
+    "file": "emoji/2705.png"
+  },
+  {
+    "name": "Arrow",
+    "text": "➡️",
+    "file": "emoji/27a1.png"
+  },
+  {
+    "name": "Warning",
+    "text": "⚠️",
+    "file": "emoji/26a0.png"
+  },
+  {
+    "name": "Wedding",
+    "text": "💍",
+    "file": "emoji/1f48d.png"
+  }
+]

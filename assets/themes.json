@@ -1,0 +1,22 @@
+[
+  {"name":"Christmas · Candy cane","text":"🎄 MERRY CHRISTMAS 🎅","color":"ffffff","bg_color":"000000","bg_color2":"003000","background":"Solid","text_palette":"Candy cane","effect":"None","animation":"scroll_left"},
+  {"name":"Christmas · Red & green","text":"🎁 HAPPY HOLIDAYS 🔔","color":"ffffff","bg_color":"000b00","bg_color2":"250000","background":"Gradient","text_palette":"Red / green","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Winter · Snowfall","text":"❄️ WINTER WONDERLAND ☃️","color":"bdefff","bg_color":"00051a","bg_color2":"002840","background":"Gradient","text_palette":"Solid","effect":"Snow","animation":"scroll_left"},
+  {"name":"New Year · Celebration","text":"🎆 HAPPY NEW YEAR 🍾","color":"ffd33d","bg_color":"080015","bg_color2":"250015","background":"Gradient","text_palette":"Solid","effect":"Confetti","animation":"scroll_left"},
+  {"name":"Valentine's Day","text":"❤️ HAPPY VALENTINE'S DAY 💝","color":"ff8ac7","bg_color":"250008","bg_color2":"10001a","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"St. Patrick's Day","text":"☘️ HAPPY ST. PATRICK'S DAY ☘️","color":"5dff58","bg_color":"001500","bg_color2":"102000","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Easter · Spring","text":"🐰 HAPPY EASTER 🐣","color":"fff0a0","bg_color":"160020","bg_color2":"002022","background":"Gradient","text_palette":"Rainbow","effect":"Confetti","animation":"scroll_left"},
+  {"name":"Fourth of July","text":"🇺🇸 HAPPY 4TH OF JULY 🎆","color":"ffffff","bg_color":"280000","bg_color2":"000028","background":"Stripes","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Halloween · Spooky","text":"🎃 HAPPY HALLOWEEN 👻","color":"ff8a00","bg_color":"0b001c","bg_color2":"220030","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Thanksgiving · Harvest","text":"🦃 HAPPY THANKSGIVING 🍁","color":"ffbd50","bg_color":"1a0700","bg_color2":"300b00","background":"Gradient","text_palette":"Solid","effect":"None","animation":"scroll_left"},
+  {"name":"Birthday · Party","text":"🎂 HAPPY BIRTHDAY 🎉","color":"ffffff","bg_color":"100020","bg_color2":"001030","background":"Gradient","text_palette":"Rainbow","effect":"Confetti","animation":"scroll_left"},
+  {"name":"Graduation","text":"🎓 CONGRATULATIONS! ⭐","color":"ffd43b","bg_color":"000010","bg_color2":"101030","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Wedding · Love","text":"💍 JUST MARRIED ❤️","color":"ffe4cc","bg_color":"150010","bg_color2":"201400","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Welcome · Photo booth","text":"📷 STRIKE A POSE! 😎","color":"ffffff","bg_color":"00101a","bg_color2":"1a001a","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"},
+  {"name":"Photo booth · Smile","text":"😀 SMILE FOR THE CAMERA! 📷","color":"ffe52c","bg_color":"000000","bg_color2":"000000","background":"Solid","text_palette":"Solid","effect":"None","animation":"scroll_left"},
+  {"name":"Business · Open","text":"OPEN","color":"39ff72","bg_color":"000000","bg_color2":"000000","background":"Solid","text_palette":"Solid","effect":"None","animation":"static"},
+  {"name":"Business · Welcome","text":"👋 WELCOME!","color":"ffffff","bg_color":"001020","bg_color2":"200010","background":"Gradient","text_palette":"Solid","effect":"None","animation":"scroll_left"},
+  {"name":"Party · Rainbow","text":"🎵 LET'S PARTY! 🥳","color":"ffffff","bg_color":"000000","bg_color2":"000000","background":"Rainbow","text_palette":"Solid","effect":"Confetti","animation":"scroll_left"},
+  {"name":"Game day","text":"🏈 GAME DAY! 🏀","color":"ffffff","bg_color":"001b08","bg_color2":"001020","background":"Gradient","text_palette":"Solid","effect":"Confetti","animation":"scroll_left"},
+  {"name":"Celebration · Cheers","text":"🍺 CHEERS! 🎉","color":"ffd552","bg_color":"150800","bg_color2":"200018","background":"Gradient","text_palette":"Solid","effect":"Sparkle","animation":"scroll_left"}
+]

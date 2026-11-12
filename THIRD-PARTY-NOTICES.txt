@@ -1,0 +1,12 @@
+Emoji artwork: Twemoji, copyright Twitter, Inc. and contributors; licensed CC BY 4.0.
+https://github.com/jdecked/twemoji
+https://creativecommons.org/licenses/by/4.0/
+Artwork is resized for the LED display.
+
+Bluetooth library: pypixelcolor 0.5.0, Lucas Balmes and contributors, MIT.
+https://github.com/lucagoc/pypixelcolor
+
+Hello Fairy wire-protocol reference: nzrutman/hello_fairy_ble and contributors.
+https://github.com/nzrutman/hello_fairy_ble
+The Windows controller implements basic packet framing and status decoding
+independently; Home Assistant is not required or bundled.

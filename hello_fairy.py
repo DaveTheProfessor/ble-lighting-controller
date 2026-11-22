@@ -108,7 +108,10 @@ async def execute(request):
     targets=request.get('fairy_devices',[])
     if not targets:raise ValueError('Select at least one light set in Fairy lights.')
     results=[]
-    for device in targets:
+    for index,device in enumerate(targets):
+        if request.get('_cancel_path') and Path(request['_cancel_path']).exists():
+            for pending in targets[index:]:results.append(dict(name=pending.get('alias',pending['name']),address=pending['address'],ok=False,cancelled=True,error='Cancelled before this light set was contacted.'))
+            break
         row=dict(name=device.get('alias',device['name']),address=device['address'])
         connection=None
         try:

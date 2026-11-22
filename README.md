@@ -7,6 +7,8 @@ Windows software for iPixel-compatible Bluetooth LED signs and Hello Fairy light
 - Windows Forms studio for text, emoji, colors, images, GIFs and saved designs.
 - Shared Bluetooth queue: one sign connection at a time, with a four-second settling period.
 - Per-sign progress, successful-send history and connection cleanup.
+- Compact scrolling animations and a default scroll speed of 40.
+- Stop sending cancels queued targets after the active transfer finishes. Closing the window lets an active transfer finish in the background.
 - Hello Fairy power, color, brightness and basic effect controls.
 - Local America/New_York schedules with per-target delivery records and guarded retries.
 
@@ -20,7 +22,7 @@ Examples contain no real devices or schedules. Configure your own hardware local
 
 ## Verification and limitations
 
-Both C# applications compile, and the four fake-device test scripts pass on the verified Windows environment. They exercise serial sending, saved-design selection, history and scheduler retry/deduplication without contacting Bluetooth hardware.
+Both C# applications compile, and the isolated test scripts pass on the verified Windows environment. They exercise serial sending, saved-design selection, history and scheduler retry/deduplication without contacting Bluetooth hardware.
 
 Fresh-machine GUI operation and compatibility with other hardware models have not been verified. Acknowledgements do not prove that displayed pixels match the intended image. A phone app holding the Bluetooth connection can prevent a PC connection.
 

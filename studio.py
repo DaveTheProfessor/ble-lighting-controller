@@ -12,6 +12,22 @@ ROOT = Path(__file__).resolve().parent
 ASSETS = ROOT / 'assets'
 EMOJI = ASSETS / 'emoji'
 FONTS = ROOT / 'runtime/Lib/site-packages/pypixelcolor/fonts'
+RENDERER_VERSION = 2
+TEXT_FRAME_LIMIT = 96
+DEFAULT_SPEED = 40
+
+def scroll_plan(strip_width,display_width,speed):
+    """Traverse the whole strip within a conservative animation budget.
+
+    Sample the entire loop, not just its first frames. Longer messages get
+    longer frame durations rather than being clipped to a playback prefix.
+    """
+    cycle=strip_width+min(24,display_width//4)
+    count=min(TEXT_FRAME_LIMIT,cycle)
+    positions=[(i*cycle)//count for i in range(count)]
+    pixels_per_second=8+max(0,min(100,int(speed)))*.55
+    duration=max(30,int(round((cycle/count)/pixels_per_second*1000/10))*10)
+    return positions,duration,cycle
 
 def rgb(value):
     value = str(value).lstrip('#')
@@ -135,9 +151,9 @@ def render(request, width=96, height=16, directory=None):
         strip = text_strip(request, height)
         effect = request.get('effect', 'None')
         animation = request.get('animation', 'scroll_left')
-        cycle = strip.width + min(24, width//4)
-        step = max(1, math.ceil(cycle / 240))
-        count = math.ceil(cycle/step) if animation in ('scroll_left','scroll_right') else (32 if animation != 'static' or effect != 'None' or request.get('background') in ('Stripes','Rainbow') else 1)
+        speed = int(request.get('speed', DEFAULT_SPEED))
+        positions,scroll_duration,cycle=scroll_plan(strip.width,width,speed)
+        count = len(positions) if animation in ('scroll_left','scroll_right') else (32 if animation != 'static' or effect != 'None' or request.get('background') in ('Stripes','Rainbow') else 1)
         frames, durations = [], []
         for i in range(count):
             image = background(request,width,height,i)
@@ -151,9 +167,9 @@ def render(request, width=96, height=16, directory=None):
                     c = (255,220,120) if effect == 'Sparkle' else tuple(int(v*255) for v in colorsys.hsv_to_rgb((n*.17)%1,1,1))
                     draw.point((x,y),fill=c)
             if animation == 'scroll_left':
-                x = -(i*step % cycle)
+                x = -positions[i]
             elif animation == 'scroll_right':
-                x = i*step % cycle
+                x = positions[i]
             else:
                 x = (width-strip.width)//2
             layer = strip
@@ -169,7 +185,7 @@ def render(request, width=96, height=16, directory=None):
                 elif animation == 'scroll_right':
                     image.paste(layer,(x-cycle,0),layer)
             frames.append(image)
-            durations.append(max(30, 160-int(request.get('speed',60))*1.25))
+            durations.append(scroll_duration if animation in ('scroll_left','scroll_right') else max(30,160-speed*1.25))
     import uuid
     path = directory / (uuid.uuid4().hex + ('.gif' if len(frames)>1 else '.png'))
     if len(frames) == 1:
@@ -180,7 +196,7 @@ def render(request, width=96, height=16, directory=None):
         atlas = Image.new('RGB', (width, height*len(frames)))
         for i, frame in enumerate(frames):
             atlas.paste(frame,(0,i*height))
-        palette = atlas.quantize(colors=256,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.NONE)
+        palette = atlas.quantize(colors=64,method=Image.Quantize.MEDIANCUT,dither=Image.Dither.NONE)
         quantized = [f.quantize(palette=palette,dither=Image.Dither.NONE) for f in frames]
         quantized[0].save(path,save_all=True,append_images=quantized[1:],duration=[int(d) for d in durations],loop=0,optimize=True,disposal=2)
-    return dict(path=str(path), width=width,height=height,frames=len(frames),bytes=path.stat().st_size)
+    return dict(path=str(path), width=width,height=height,frames=len(frames),bytes=path.stat().st_size,renderer_version=RENDERER_VERSION)

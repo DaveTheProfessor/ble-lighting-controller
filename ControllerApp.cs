@@ -31,7 +31,7 @@ public class SignController : Form {
         color.Items.AddRange(new object[]{"White","Red","Green","Blue","Yellow","Cyan","Magenta"}); color.SelectedIndex=0;
         LabelAt("Animation",180,275,170); Place(animation,180,302,170,30); animation.DropDownStyle=ComboBoxStyle.DropDownList;
         animation.Items.AddRange(new object[]{"scroll_left","static","scroll_right"}); animation.SelectedIndex=0;
-        LabelAt("Speed (0-100)",370,275,120); Place(speed,370,302,100,30); speed.Maximum=100; speed.Value=60;
+        LabelAt("Speed (0-100)",370,275,120); Place(speed,370,302,100,30); speed.Maximum=100; speed.Value=40;
         AddButton("Send message",490,299,150,"text");
         LabelAt("Brightness (%)",20,354,180); Place(brightness,20,383,100,30); brightness.Maximum=100; brightness.Value=50;
         AddButton("Apply brightness",135,380,165,"brightness"); AddButton("Turn on",330,380,140,"on"); AddButton("Turn off",490,380,150,"off");

@@ -12,12 +12,23 @@ from bleak import BleakScanner
 from bleak.exc import BleakError
 from pypixelcolor import AsyncClient
 from datetime import datetime
-from studio import render
+from studio import DEFAULT_SPEED, RENDERER_VERSION, render
 from sent_history import record_success
 
 ROOT = Path(__file__).resolve().parent
 SIGN_PAUSE_SECONDS = 4.0
 _pending_client = None
+class SendCancelled(Exception):pass
+
+def cancelled(request):
+    path=request.get('_cancel_path')
+    return bool(path and Path(path).exists())
+
+def cancellation_result(request,targets,results):
+    for device in targets:
+        results.append(dict(name=device['name'],address=device['address'],ok=False,cancelled=True,skipped=True,error='Cancelled before this sign was contacted.'))
+    progress(request,'Stopped. Remaining signs were cancelled.',results)
+    return dict(ok=False,cancelled=True,results=results)
 
 def progress(request,message,results=None):
     path=request.get('_progress_path')
@@ -57,6 +68,7 @@ async def execute(request):
             lock.write(b'0')
             lock.flush()
         for attempt in range(1200):
+            if cancelled(request):return cancellation_result(request,request.get('devices',request.get('fairy_devices',[])),[])
             lock.seek(0)
             try:
                 msvcrt.locking(lock.fileno(), msvcrt.LK_NBLCK, 1)
@@ -119,6 +131,7 @@ async def _execute(request):
         raise ValueError('Enter a message of 1 to 500 characters.')
     results = []
     for index,device in enumerate(targets):
+        if cancelled(request):return cancellation_result(request,targets[index:],results)
         label=device.get('alias',device['name'])
         progress(request,f'Sign {index+1} of {len(targets)}: {label} — connecting',results)
         client = AsyncClient(device['address'])
@@ -136,15 +149,19 @@ async def _execute(request):
                     await asyncio.sleep(SIGN_PAUSE_SECONDS)
                     client = AsyncClient(device['address'])
             row['info'] = asdict(client.get_device_info())
+            if cancelled(request):
+                raise SendCancelled()
             progress(request,f'Sign {index+1} of {len(targets)}: {label} — sending',results)
             if action in ('design', 'replace_design'):
                 info = client.get_device_info()
                 prepared = request.get('prepared', {})
-                if prepared.get('width') == info.width and prepared.get('height') == info.height and Path(prepared.get('path','')).is_file():
+                old_text_animation=(request.get('content','text')=='text' and request.get('animation','scroll_left') in ('scroll_left','scroll_right') and prepared.get('renderer_version')!=RENDERER_VERSION)
+                if prepared.get('width') == info.width and prepared.get('height') == info.height and Path(prepared.get('path','')).is_file() and not old_text_animation:
                     content = prepared
                 else:
                     content = render(request, info.width, info.height)
                 save_slot=1 if action=='replace_design' else int(request.get('save_slot',0))
+                if cancelled(request):raise SendCancelled()
                 await asyncio.wait_for(client.send_image(content['path'], save_slot=save_slot), 240)
                 row['uploaded']=True
                 if save_slot>0:
@@ -163,7 +180,7 @@ async def _execute(request):
                 await asyncio.wait_for(client.send_text(
                     request['text'], color=request.get('color', 'ffffff'),
                     animation=request.get('animation', 'scroll_left'),
-                    speed=int(request.get('speed', 60)), save_slot=0), 60)
+                    speed=int(request.get('speed', DEFAULT_SPEED)), save_slot=0), 60)
             elif action == 'brightness':
                 await asyncio.wait_for(client.set_brightness(int(request['brightness'])), 10)
             elif action in ('on', 'off'):
@@ -181,6 +198,8 @@ async def _execute(request):
             elif action == 'timer':
                 await asyncio.wait_for(client.set_timer(request.get('timer_action','start')), 10)
             row['ok'] = True
+        except SendCancelled:
+            row.update(ok=False,cancelled=True,skipped=True,error='Stopped before uploading this sign.')
         except Exception as exc:
             row.update(ok=False, error=f'{type(exc).__name__}: {exc}')
         finally:
@@ -200,6 +219,7 @@ async def _execute(request):
             except Exception as exc:
                 row['history_warning'] = 'Sent successfully, but history could not be saved: ' + str(exc)
         results.append(row)
+        if cancelled(request):return cancellation_result(request,targets[index+1:],results)
         if not released:
             for pending in targets[index+1:]:
                 results.append(dict(name=pending['name'],address=pending['address'],ok=False,skipped=True,error='Not attempted because the previous Bluetooth connection did not close. Retry this sign separately.'))
@@ -219,6 +239,7 @@ def main():
     try:
         request = json.loads(Path(args.request).read_text(encoding='utf-8-sig'))
         request['_progress_path']=args.response+'.progress.json'
+        request['_cancel_path']=args.response+'.cancel'
         response = asyncio.run(execute(request))
     except Exception as exc:
         response = dict(ok=False, error=f'{type(exc).__name__}: {exc}')

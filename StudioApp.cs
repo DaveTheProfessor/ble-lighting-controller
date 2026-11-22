@@ -20,7 +20,7 @@ class PixelPreview : Control {
         ImageAnimator.Animate(image,Changed); Invalidate();
     }
     public void ClearImage() {if(image!=null){ImageAnimator.StopAnimate(image,Changed);image.Dispose();stream.Dispose();image=null;}Invalidate();}
-    void Changed(object s,EventArgs e) {if(!IsDisposed && IsHandleCreated)BeginInvoke((Action)(()=>Invalidate()));}
+    void Changed(object s,EventArgs e) {if(!IsDisposed && IsHandleCreated){try{BeginInvoke((Action)(()=>Invalidate()));}catch(InvalidOperationException){}}}
     protected override void OnPaint(PaintEventArgs e) {
         base.OnPaint(e); if(image==null)return; ImageAnimator.UpdateFrames(image);
         int scale=Math.Max(1,Math.Min(ClientSize.Width/image.Width,ClientSize.Height/image.Height));
@@ -42,6 +42,7 @@ class PixelCanvas : Control {
 }
 
 public class SignStudio : Form {
+    const int DefaultSpeed = 40;
     protected override bool ShowWithoutActivation {get{return WindowState==FormWindowState.Minimized;}}
     readonly string root=AppDomain.CurrentDomain.BaseDirectory;
     readonly JavaScriptSerializer json=new JavaScriptSerializer();
@@ -50,7 +51,7 @@ public class SignStudio : Form {
     readonly ComboBox animation=new ComboBox(),background=new ComboBox(),palette=new ComboBox(),font=new ComboBox(),effect=new ComboBox(),previewSize=new ComboBox(),fit=new ComboBox();
     readonly NumericUpDown speed=new NumericUpDown(),fontSize=new NumericUpDown(),brightness=new NumericUpDown(),slot=new NumericUpDown(),clockStyle=new NumericUpDown(),score1=new NumericUpDown(),score2=new NumericUpDown();
     readonly CheckBox persist=new CheckBox(),showDate=new CheckBox(),format24=new CheckBox();
-    readonly Button fore=new Button(),back=new Button(),accent=new Button(),ink=new Button(),send=new Button(),previewButton=new Button();
+    readonly Button fore=new Button(),back=new Button(),accent=new Button(),ink=new Button(),send=new Button(),previewButton=new Button(),stopSending=new Button();
     readonly PixelPreview preview=new PixelPreview();
     readonly PixelCanvas canvas=new PixelCanvas();
     readonly TabControl tabs=new TabControl();
@@ -80,6 +81,7 @@ public class SignStudio : Form {
     Process worker;
     string requestPath,responsePath,operation,previewKey;
     string currentContent="text";
+    bool stopRequested=false;
     Dictionary<string,object> prepared;
     readonly ToolTip tips=new ToolTip();
     readonly HashSet<string> selectedAddresses=new HashSet<string>();
@@ -100,7 +102,8 @@ public class SignStudio : Form {
         Btn(this,"Turn on",18,435,120,()=>RunAction("on"));Btn(this,"Turn off",148,435,120,()=>RunAction("off"));
         LabelAt(this,"Preview size",18,490,250);Combo(this,previewSize,18,518,250,new[]{"96 x 16  (Original / Large)","192 x 16  (XL)"});
         LabelAt(this,"Close iPixel Color on your iPhone if a sign is busy. Each command releases the Bluetooth connection when finished.",18,572,250,92);
-        LabelAt(this,"Designs are fitted to each sign's own dimensions when sent.",18,679,250,58);
+        Put(this,stopSending,18,676,250,36);stopSending.Text="Stop sending";stopSending.Enabled=false;stopSending.Click+=(s,e)=>RequestStop();
+        LabelAt(this,"Designs fit each sign automatically.",18,718,250,23);
         LabelAt(this,"LED SIGN STUDIO",290,16,720);
         Put(this,preview,290,43,730,120);preview.Anchor=AnchorStyles.Top|AnchorStyles.Left|AnchorStyles.Right;
         Put(this,previewCaption,290,170,730,25);previewCaption.Text="Rendered preview - click Preview after editing.";
@@ -119,7 +122,7 @@ public class SignStudio : Form {
         timer.Interval=400;timer.Tick+=Poll;
         try {string path=Path.Combine(root,"studio-settings.json");if(File.Exists(path)){var settings=json.Deserialize<Dictionary<string,object>>(File.ReadAllText(path,Encoding.UTF8));if(settings.ContainsKey("selected"))foreach(object address in (IEnumerable)settings["selected"])selectedAddresses.Add(address.ToString());if(settings.ContainsKey("design")){var design=(Dictionary<string,object>)settings["design"];ApplyDesign(design);if(Get(design,"content","text")=="image"){tabs.SelectedIndex=2;currentContent="image";}previewSize.SelectedIndex=Get(design,"width","96")=="192"?1:0;}}}catch(Exception ex){status.Text="Previous settings could not be loaded: "+ex.Message;}
         LoadDevices();RefreshSaved();LoadFairyDevices();LoadScheduleTargets();
-        FormClosing+=(s,e)=>{if(worker!=null&&!worker.HasExited){e.Cancel=true;status.Text="Please wait for the current Bluetooth operation to finish.";}else{try{var checkedAddresses=new List<string>();foreach(int i in signs.CheckedIndices)checkedAddresses.Add(devices[i]["address"].ToString());var settings=new Dictionary<string,object>{{"selected",checkedAddresses},{"design",ContentRequest()}};File.WriteAllText(Path.Combine(root,"studio-settings.json"),json.Serialize(settings),Encoding.UTF8);}catch{}}};
+        FormClosing+=(s,e)=>{try{var checkedAddresses=new List<string>();foreach(int i in signs.CheckedIndices)checkedAddresses.Add(devices[i]["address"].ToString());var settings=new Dictionary<string,object>{{"selected",checkedAddresses},{"design",ContentRequest()}};File.WriteAllText(Path.Combine(root,"studio-settings.json"),json.Serialize(settings),Encoding.UTF8);}catch{}timer.Stop();if(worker!=null){worker.Dispose();worker=null;}};
     }
     static string Get(Dictionary<string,object> d,string k,string fallback) {return d.ContainsKey(k)&&d[k]!=null?d[k].ToString():fallback;}
     void Put(Control p,Control c,int x,int y,int w,int h) {c.SetBounds(x,y,w,h);p.Controls.Add(c);}
@@ -140,7 +143,7 @@ public class SignStudio : Form {
         LabelAt(p,"Size",410,132,70);Number(p,fontSize,410,153,65,6,16,13);
         LabelAt(p,"Motion",490,132,100);Combo(p,animation,490,153,210,new[]{"Scroll left","Still","Scroll right","Blink","Fade"});
         LabelAt(p,"Decoration",14,190,132);Combo(p,effect,14,212,132,new[]{"None","Snow","Sparkle","Confetti"});
-        LabelAt(p,"Speed (0-100)",156,190,132);Number(p,speed,156,212,90,0,100,60);
+        LabelAt(p,"Speed (0-100)",156,190,132);Number(p,speed,156,212,90,0,100,DefaultSpeed);
         LabelAt(p,"Emoji palette - click to insert",270,211,430);
         var panel=new FlowLayoutPanel();Put(p,panel,14,251,686,113);panel.AutoScroll=true;
         var entries=json.Deserialize<List<Dictionary<string,object>>>(File.ReadAllText(Path.Combine(root,"assets","emojis.json"),Encoding.UTF8));
@@ -321,7 +324,7 @@ public class SignStudio : Form {
     void ApplyDesign(Dictionary<string,object> d) {
         message.Text=Get(d,"text","WELCOME!");SetColor(fore,Get(d,"color","ffffff"));SetColor(back,Get(d,"bg_color","000000"));SetColor(accent,Get(d,"bg_color2","000030"));
         SetCombo(background,Get(d,"background","Solid"));SetCombo(palette,Get(d,"text_palette","Solid"));SetCombo(font,Get(d,"font","Pixel"));SetCombo(effect,Get(d,"effect","None"));string motion=Get(d,"animation","scroll_left");SetCombo(animation,motion=="static"?"Still":System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(motion.Replace('_',' ')).Replace("Left","left").Replace("Right","right"));
-        fontSize.Value=Math.Max(6,Math.Min(16,Int32.Parse(Get(d,"font_size","13"))));speed.Value=Math.Max(0,Math.Min(100,Int32.Parse(Get(d,"speed","60"))));
+        fontSize.Value=Math.Max(6,Math.Min(16,Int32.Parse(Get(d,"font_size","13"))));speed.Value=Math.Max(0,Math.Min(100,Int32.Parse(Get(d,"speed",DefaultSpeed.ToString()))));
         imagePath.Text=Get(d,"image_path","");SetCombo(fit,Get(d,"fit","fit"));
     }
     void SetColor(Button b,string hex) {b.BackColor=ColorTranslator.FromHtml("#"+hex);b.ForeColor=b.BackColor.GetBrightness()<.5?Color.White:Color.Black;}
@@ -333,9 +336,11 @@ public class SignStudio : Form {
     }
     void LoadDesign() {if(saved.SelectedItem==null)return;var d=json.Deserialize<Dictionary<string,object>>(File.ReadAllText(Path.Combine(root,"designs",saved.SelectedItem+".json"),Encoding.UTF8));ApplyDesign(d);tabs.SelectedIndex=Get(d,"content","text")=="image"?2:0;status.Text="Design loaded.";}
     void ExportPreview() {if(prepared==null){status.Text="Create a preview first.";return;}string path=prepared["path"].ToString();using(var d=new SaveFileDialog()){d.Filter=Path.GetExtension(path)==".gif"?"GIF animation|*.gif":"PNG image|*.png";d.FileName="LED design"+Path.GetExtension(path);if(d.ShowDialog()==DialogResult.OK){File.Copy(path,d.FileName,true);status.Text="Preview exported.";}}}
-    void UpdateButtons() {bool ready=worker==null;bool fairy=tabs.SelectedIndex==7;foreach(var b in actionButtons)b.Enabled=ready&&!(fairy&&b.Parent==this&&b.Left<280);tabs.Enabled=ready;signs.Enabled=ready&&!fairy;alias.Enabled=ready&&!fairy;brightness.Enabled=ready&&!fairy;previewSize.Enabled=ready&&!fairy;persist.Enabled=ready&&!fairy;slot.Enabled=ready&&!fairy;previewButton.Enabled=ready&&tabs.SelectedIndex<5;send.Enabled=ready&&tabs.SelectedIndex<5;}
+    void UpdateButtons() {bool ready=worker==null;bool fairy=tabs.SelectedIndex==7;foreach(var b in actionButtons)b.Enabled=ready&&!(fairy&&b.Parent==this&&b.Left<280);tabs.Enabled=ready;signs.Enabled=ready&&!fairy;alias.Enabled=ready&&!fairy;brightness.Enabled=ready&&!fairy;previewSize.Enabled=ready&&!fairy;persist.Enabled=ready&&!fairy;slot.Enabled=ready&&!fairy;previewButton.Enabled=ready&&tabs.SelectedIndex<5;send.Enabled=ready&&tabs.SelectedIndex<5;stopSending.Enabled=!ready&&!stopRequested&&!operation.StartsWith("schedule_")&&operation!="preview"&&operation!="scan"&&operation!="fairy_scan";}
+    void RequestStop() {if(worker==null||responsePath==null)return;try{File.WriteAllText(responsePath+".cancel","stop");stopRequested=true;stopSending.Enabled=false;status.Text="Stop requested. A transfer already in progress will finish safely; remaining signs will not be sent.";}catch(Exception ex){status.Text="Could not request stop: "+ex.Message;}}
     void RunAction(string action,string timerAction="start") {
         if(worker!=null)return;
+        stopRequested=false;
         try {
             var targets=new List<Dictionary<string,object>>();foreach(int i in signs.CheckedIndices)targets.Add(devices[i]);
             if(action!="scan"&&action!="preview"&&targets.Count==0){status.Text="Select at least one sign.";return;}
@@ -355,7 +360,7 @@ public class SignStudio : Form {
     }
     void Poll(object sender,EventArgs e) {
         if(worker==null)return;
-        if(!worker.HasExited){string path=responsePath+".progress.json";if(File.Exists(path)){try{var progress=json.Deserialize<Dictionary<string,object>>(File.ReadAllText(path,Encoding.UTF8));var lines=new List<string>();lines.Add(progress["message"].ToString());foreach(object item in (IEnumerable)progress["completed"]){var row=(Dictionary<string,object>)item;lines.Add(row["name"]+((bool)row["ok"]?": completed":": failed / not attempted"));}status.Text=String.Join(Environment.NewLine,lines);}catch{}}return;}
+        if(!worker.HasExited){string path=responsePath+".progress.json";if(File.Exists(path)){try{var progress=json.Deserialize<Dictionary<string,object>>(File.ReadAllText(path,Encoding.UTF8));var lines=new List<string>();if(stopRequested)lines.Add("Stopping after the current transfer; queued signs are cancelled.");lines.Add(progress["message"].ToString());foreach(object item in (IEnumerable)progress["completed"]){var row=(Dictionary<string,object>)item;lines.Add(row["name"]+((bool)row["ok"]?": completed":": failed / not attempted"));}status.Text=String.Join(Environment.NewLine,lines);}catch{}}return;}
         timer.Stop();
         try {
             var r=json.Deserialize<Dictionary<string,object>>(File.ReadAllText(responsePath,Encoding.UTF8));
@@ -371,7 +376,7 @@ public class SignStudio : Form {
                 }status.Text=String.Join(Environment.NewLine,lines);File.WriteAllText(Path.Combine(root,"devices.json"),json.Serialize(devices),Encoding.UTF8);
             }
         }catch(Exception ex){status.Text=ex.Message;}
-        finally{worker.Dispose();worker=null;UpdateButtons();try{File.Delete(requestPath);File.Delete(responsePath);File.Delete(responsePath+".progress.json");}catch{}}
+        finally{worker.Dispose();worker=null;stopRequested=false;UpdateButtons();try{File.Delete(requestPath);File.Delete(responsePath);File.Delete(responsePath+".progress.json");File.Delete(responsePath+".cancel");}catch{}}
     }
     [STAThread]public static void Main(string[] args) {
         Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);

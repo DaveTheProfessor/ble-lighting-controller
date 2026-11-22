@@ -23,7 +23,7 @@ async def main():
     with tempfile.TemporaryDirectory() as temp:
         root=Path(temp).resolve();c.ROOT=root;c.AsyncClient=Fake;c.SIGN_PAUSE_SECONDS=0
         path=root/'design.png';Image.new('RGB',(96,16),'red').save(path)
-        request=dict(action='design',devices=[dict(address='TEST',name='Test')],save_slot=3,content='text',text='Test',prepared=dict(path=str(path),width=96,height=16,frames=1,bytes=path.stat().st_size))
+        request=dict(action='design',devices=[dict(address='TEST',name='Test')],save_slot=3,content='text',text='Test',prepared=dict(path=str(path),width=96,height=16,frames=1,bytes=path.stat().st_size,renderer_version=c.RENDERER_VERSION))
         result=await c.execute(request);assert result['ok']
         assert calls==[('upload',3),('show',3)],calls
         calls.clear();request['action']='replace_design'

@@ -23,6 +23,8 @@ These use temporary directories, synthetic identities, fake Bluetooth clients an
     .\runtime\python.exe -B .\tests\test_saved_selection.py
     .\runtime\python.exe -B .\tests\test_sent_history.py
     .\runtime\python.exe -B .\tests\test_sign_schedule.py
+    .\runtime\python.exe -B .\tests\test_long_scroll.py
+    .\runtime\python.exe -B .\tests\test_stop_sending.py
 
 Do not run the scheduler installer as part of testing.
 
